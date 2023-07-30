@@ -26,6 +26,7 @@ from .helper.ext_utils.fs_utils import clean_all, exit_clean_up, start_cleanup
 from .helper.telegram_helper.button_build import ButtonMaker
 from .helper.telegram_helper.bot_commands import BotCommands
 from .helper.telegram_helper.filters import CustomFilters
+from .helper.themes import BotTheme
 from .helper.telegram_helper.message_utils import (editMessage, sendFile,
                                                    sendMessage, auto_delete_message)
 from .modules import (anonymous, authorize, bot_settings, cancel_mirror,
@@ -54,33 +55,35 @@ async def stats(_, message, edit_mode=False):
     swap        = swap_memory()
     mem_p       = memory.percent
 
-    bot_stats = f'<b><i><u>Zee Bot Statistics</u></i></b>\n\n'\
-                f'<code>CPU  : </code>{get_progress_bar_string(cpuUsage)} {cpuUsage}%\n' \
-                f'<code>RAM  : </code>{get_progress_bar_string(mem_p)} {mem_p}%\n' \
-                f'<code>SWAP : </code>{get_progress_bar_string(swap.percent)} {swap.percent}%\n' \
-                f'<code>DISK : </code>{get_progress_bar_string(disk)} {disk}%\n\n' \
-                f'<code>Bot Uptime      : </code> {botTime}\n' \
-                f'<code>BOT Restart     : </code> {res_time}\n\n' \
-                f'<code>Uploaded        : </code> {sent}\n' \
-                f'<code>Downloaded      : </code> {recv}\n' \
-                f'<code>Total Bandwidth : </code> {tb}'
+    bot_stats = BotTheme('BOTSTATS',
+                         cpu=get_progress_bar_string(cpuUsage),
+                         ram=get_progress_bar_string(mem_p),
+                         swap=get_progress_bar_string(swap.percent),
+                         disk=get_progress_bar_string(disk),
+                         bot_uptime=botTime,
+                         bot_restart=res_time,
+                         uploaded=sent,
+                         downloaded=recv,
+                         total_bandwith=tb,
+                         )
 
-    sys_stats = f'<b><i><u>Zee System Statistics</u></i></b>\n\n'\
-                f'<b>System Uptime:</b> <code>{sysTime}</code>\n' \
-                f'<b>CPU:</b> {get_progress_bar_string(cpuUsage)}<code> {cpuUsage}%</code>\n' \
-                f'<b>CPU Total Core(s):</b> <code>{cpu_count(logical=True)}</code>\n' \
-                f'<b>P-Core(s):</b> <code>{cpu_count(logical=False)}</code> | ' \
-                f'<b>V-Core(s):</b> <code>{v_core}</code>\n' \
-                f'<b>Frequency:</b> <code>{cpu_freq(percpu=False).current / 1000:.2f} GHz</code>\n\n' \
-                f'<b>RAM:</b> {get_progress_bar_string(mem_p)}<code> {mem_p}%</code>\n' \
-                f'<b>Total:</b> <code>{get_readable_file_size(memory.total)}</code> | ' \
-                f'<b>Free:</b> <code>{get_readable_file_size(memory.available)}</code>\n\n' \
-                f'<b>SWAP:</b> {get_progress_bar_string(swap.percent)}<code> {swap.percent}%</code>\n' \
-                f'<b>Total</b> <code>{get_readable_file_size(swap.total)}</code> | ' \
-                f'<b>Free:</b> <code>{get_readable_file_size(swap.free)}</code>\n\n' \
-                f'<b>DISK:</b> {get_progress_bar_string(disk)}<code> {disk}%</code>\n' \
-                f'<b>Total:</b> <code>{total}</code> | <b>Free:</b> <code>{free}</code>'
 
+    sys_stats = BotTheme('SYSSTATUS',
+                         system_uptime={sysTime},
+                         p_core=cpu_count(logical=False),
+                         v_core=v_core,
+                         frequency=f"{cpu_freq(percpu=False).current / 1000:.2f} GHz" if cpu_freq() else "Access Denied",
+                         ram=get_progress_bar_string(mem_p), {mem_p},
+                         total=get_readable_file_size(memory.total),
+                         free=get_readable_file_size(memory.available),
+                         swap=get_progress_bar_string(swap.percent), {swap.percent},
+                         total=get_readable_file_size(swap.total),
+                         free=get_readable_file_size(swap.free),
+                         disk=get_progress_bar_string(disk),
+                         total={total},
+                         free={free}
+                        )
+  
     buttons.ibutton("Sys Stats",  "show_sys_stats")
     buttons.ibutton("Repo Stats", "show_repo_stats")
     buttons.ibutton("Bot Limits", "show_bot_limits")
@@ -126,10 +129,12 @@ async def send_repo_stats(_, query):
         version     = 'N/A'
         change_log  = 'N/A'
 
-    repo_stats = f'<b><i><u>Repo Info</u></i></b>\n\n' \
-                  f'<code>Updated   : </code> {last_commit}\n' \
-                  f'<code>Version   : </code> {version}\n' \
-                  f'<code>Changelog : </code> {change_log}'
+    repo_stats = BotTheme('REPOINFO',
+                          updated=last_commit
+                          version=version
+                          changelog=change_log
+                          )
+               
 
     buttons.ibutton("Bot Stats",  "show_bot_stats")
     buttons.ibutton("Sys Stats",  "show_sys_stats")
@@ -152,16 +157,17 @@ async def send_bot_limits(_, query):
     UMT = 'Unlimited' if config_dict['USER_MAX_TASKS']  == '' else config_dict['USER_MAX_TASKS']
     BMT = 'Unlimited' if config_dict['QUEUE_ALL']       == '' else config_dict['QUEUE_ALL']
 
-    bot_limit = f'<b><i><u>Zee Bot Limitations</u></i></b>\n' \
-                f'<code>Torrent   : {TOR}</code> <b>GB</b>\n' \
-                f'<code>G-Drive   : {GDL}</code> <b>GB</b>\n' \
-                f'<code>Yt-Dlp    : {YTD}</code> <b>GB</b>\n' \
-                f'<code>Direct    : {DIR}</code> <b>GB</b>\n' \
-                f'<code>Clone     : {CLL}</code> <b>GB</b>\n' \
-                f'<code>Leech     : {TGL}</code> <b>GB</b>\n' \
-                f'<code>MEGA      : {MGA}</code> <b>GB</b>\n\n' \
-                f'<code>User Tasks: {UMT}</code>\n' \
-                f'<code>Bot Tasks : {BMT}</code>'
+    bot_limit = BotTheme(BOTLIMIT,
+                         torrent={TOR},
+                         g_drive={GDL},
+                         yt_dlp={YTD},
+                         direct={DIR},
+                         clone={CLL},
+                         leech={TGL},
+                         mega={MGA},
+                         user_tasks={UMT},
+                         bot_tasks={BMT}
+                        )                  
 
     buttons.ibutton("Bot Stats",  "show_bot_stats")
     buttons.ibutton("Sys Stats",  "show_sys_stats")
@@ -182,6 +188,10 @@ async def send_close_signal(_, query):
 
 
 async def start(_, message):
+    buttons = ButtonMaker()
+    buttons.ubutton(BotTheme('ST_BN1_NAME'), BotTheme('ST_BN1_URL'))
+    buttons.ubutton(BotTheme('ST_BN2_NAME'), BotTheme('ST_BN2_URL'))
+    reply_markup = buttons.build_menu(2)
     if len(message.command) > 1:
         userid = message.from_user.id
         input_token = message.command[1]
@@ -197,14 +207,10 @@ async def start(_, message):
         msg += f'Validity: {get_readable_time(int(config_dict["TOKEN_TIMEOUT"]))}'
         return await sendMessage(message, msg)
     elif config_dict['DM_MODE']:
-        start_string = 'Bot Started.\n' \
-                       'Now I can send your stuff here.\n' \
-                       'Use me here: @Z_Mirror'
+        await sendMessage(message, BotTheme('ST_BOTPM'), reply_markup, photo='IMAGES')
     else:
-        start_string = 'Sorry, you cant use me here!\n' \
-                       'Join @Z_Mirror to use me.\n' \
-                       'Thank You'
-    await sendMessage(message, start_string)
+        await sendMessage(message, BotTheme('ST_UNAUTH'), reply_markup, photo='IMAGES')
+    await DbManger().update_pm_users(message.from_user.id)
 
 
 async def restart(_, message):
@@ -231,7 +237,9 @@ async def ping(_, message):
     await editMessage(reply, f'{ping_time} ms')
 
 async def log(_, message):
-    await sendFile(message, 'Z_Logs.txt')
+    buttons = ButtonMaker()
+    buttons.ibutton('📑 Log Display', f'wzmlx {message.from_user.id} logdisplay')
+    await sendFile(message, 'Logs.txt', buttons=buttons.build_menu(1))
 
 help_string = f'''
 <b>NOTE: Click on any CMD to see more detalis.</b>
