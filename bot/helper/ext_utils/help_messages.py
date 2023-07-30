@@ -228,5 +228,7 @@ Reply to an active <code>/{cmd}</code> which was used to start the qb-download o
 This command mainly for selection incase you decided to select files from already added torrent.
 But you can always use <code>/{mir}</code> with arg `-s` to select files before download start.
 
-<b>Powered By @Z_Mirror</b>
+<b>Powered By @TOMEN</b>
 """
+default_desp = {'MIRROR_LOG_ID': "Chat ID to where Mirror files would be Send. Int. NOTE: Only available for superGroup/channel. Add -100 before channel/superGroup id. In short don't add bot id or your id!. For Multiple id Separate them by space.",
+               }
