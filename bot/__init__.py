@@ -405,6 +405,10 @@ BOT_THEME = environ.get('BOT_THEME', '')
 if len(BOT_THEME) == 0:
     BOT_THEME = 'minimal'
 
+MIRROR_LOG_ID = environ.get('MIRROR_LOG_ID', '')
+if len(MIRROR_LOG_ID) == 0:
+    MIRROR_LOG_ID = ''
+
 config_dict = {
     "AS_DOCUMENT": AS_DOCUMENT,
     "AUTHORIZED_CHATS": AUTHORIZED_CHATS,
@@ -479,7 +483,8 @@ config_dict = {
     "DM_MODE": DM_MODE,
     "DELETE_LINKS": DELETE_LINKS,
     "TOKEN_TIMEOUT": TOKEN_TIMEOUT,
-    'BOT_THEME': BOT_THEME
+    'BOT_THEME': BOT_THEME,
+    'MIRROR_LOG_ID': MIRROR_LOG_ID
 }
 
 config_dict = OrderedDict(sorted(config_dict.items()))
