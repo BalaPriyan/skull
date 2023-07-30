@@ -374,6 +374,11 @@ async def load_config():
     else:
         TOKEN_TIMEOUT = ''
 
+
+    MIRROR_LOG_ID = environ.get('MIRROR_LOG_ID', '')
+    if len(MIRROR_LOG_ID) == 0:
+        MIRROR_LOG_ID = ''
+
     list_drives_dict.clear()
     categories_dict.clear()
 
@@ -517,6 +522,7 @@ async def load_config():
                         'USE_SERVICE_ACCOUNTS': USE_SERVICE_ACCOUNTS,
                         'WEB_PINCODE': WEB_PINCODE,
                         'YTDLP_LIMIT': YTDLP_LIMIT,
+                        'MIRROR_LOG_ID': MIRROR_LOG_ID,
                         'YT_DLP_OPTIONS': YT_DLP_OPTIONS})
 
     if DATABASE_URL:
